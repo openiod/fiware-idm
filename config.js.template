@@ -2,7 +2,7 @@ var config = {};
 
 config.port = (process.env.IDM_PORT || 3000 );
 config.host = (process.env.IDM_HOST || 'http://localhost:' + config.port);
-
+config.urlPrefix = (process.env.IDM_URLPREFIX || '');  //e.g. 'fiware-idm''
 
 // HTTPS enable
 config.https = {
