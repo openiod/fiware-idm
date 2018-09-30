@@ -31,7 +31,7 @@ app.set('view engine', 'ejs');
 // Set logs in development
 app.use(logger('dev'));
 
-// Disabled header 
+// Disabled header
 app.disable('x-powered-by');
 
 // Parse request
@@ -41,7 +41,7 @@ app.use(bodyParser.urlencoded());
 var up_date = new Date();
 
 // Set routes for version
-app.use('/version', function (req, res) {
+app.use(config.urlPrefix+'/version', function (req, res) {
   var version = require('./version.json');
   version.keyrock.uptime = require('./lib/time').msToTime(new Date() - up_date);
   version.keyrock.api.link = config.host + '/' + version.keyrock.api.version;
@@ -68,7 +68,7 @@ app.use(sassMiddleware({
     debug: true,
     // outputStyle: 'compressed',
     outputStyle: 'extended',
-    prefix:  '/stylesheets'  // Where prefix is at <link rel="stylesheets" href="prefix/style.css"/>
+    prefix:  config.urlPrefix+'/stylesheets'  // Where prefix is at <link rel="stylesheets" href="prefix/style.css"/>
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
@@ -81,25 +81,25 @@ app.use(function(req, res, next) {
 
   // init req.session.redir
   if (!req.session.redir) {
-    req.session.redir = '/';
+    req.session.redir = config.urlPrefix+'/';
   }
 
   // To make visible req.session in the view
   res.locals.session = req.session;
-  
+
   // {text: 'message text', type: 'info | success | warning | danger'}
   res.locals.message = {};
 
   res.locals.site = config.site;
   res.locals.fs = require('fs');
-  
+
   next();
 });
 
 
 // Force HTTPS connection to web server
 if (config.https.enabled) {
-  
+
   app.set('forceSSLOptions', {
     enable301Redirects: true,
     trustXFPHeader: false,
@@ -108,33 +108,33 @@ if (config.https.enabled) {
   });
 
   // Set routes for api
-  app.use('/v1', forceSsl, api);
-  app.use('/v3', forceSsl, api); // REDIRECT OLD KEYSTONE REQUESTS TO THE SAME API
+  app.use(config.urlPrefix+'/v1', forceSsl, api);
+  app.use(config.urlPrefix+'/v3', forceSsl, api); // REDIRECT OLD KEYSTONE REQUESTS TO THE SAME API
 
   // Set routes for oauth2
-  app.use('/oauth2', forceSsl, oauth2);
-  app.get('/user', forceSsl, require('./controllers/oauth2/oauth2').authenticate_token);
+  app.use(config.urlPrefix+'/oauth2', forceSsl, oauth2);
+  app.get(config.urlPrefix+'/user', forceSsl, require('./controllers/oauth2/oauth2').authenticate_token);
 
-  // Set routes for saml2 
-  app.use('/saml2', forceSsl, saml2);
+  // Set routes for saml2
+  app.use(config.urlPrefix+'/saml2', forceSsl, saml2);
 
   // Set routes for GUI
-  app.use('/', forceSsl, index);
+  app.use(config.urlPrefix+'/', forceSsl, index);
 } else {
 
   // Set routes for api
-  app.use('/v1', api);
-  app.use('/v3', api); // REDIRECT OLD KEYSTONE REQUESTS TO THE SAME API
+  app.use(config.urlPrefix+'/v1', api);
+  app.use(config.urlPrefix+'/v3', api); // REDIRECT OLD KEYSTONE REQUESTS TO THE SAME API
 
   // Set routes for oauth2
-  app.use('/oauth2', oauth2);
-  app.get('/user', require('./controllers/oauth2/oauth2').authenticate_token);
+  app.use(config.urlPrefix+'/oauth2', oauth2);
+  app.get(config.urlPrefix+'/user', require('./controllers/oauth2/oauth2').authenticate_token);
 
   // Set routes for saml2
-  app.use('/saml2',  saml2);
+  app.use(config.urlPrefix+'/saml2',  saml2);
 
   // Set routes for GUI
-  app.use('/', index);
+  app.use(config.urlPrefix+'/', index);
 }
 
 // Check connection with Authzforce
@@ -147,4 +147,3 @@ if (config.authorization.authzforce.enabled) {
 }
 
 module.exports = app;
-

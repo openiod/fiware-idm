@@ -5,7 +5,7 @@ var router = express.Router();
 var web_home_controller = require('../../controllers/web/index').homes;
 
 // Routes for home
-router.get('/',   web_home_controller.index)
-router.get('/help_about',   web_home_controller.help_about)
+router.get(config.urlPrefix+'/',   web_home_controller.index)
+router.get(config.urlPrefix+'/help_about',   web_home_controller.help_about)
 
 module.exports = router;
