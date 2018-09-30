@@ -4,6 +4,8 @@ var bodyParser = require('body-parser');
 
 var router = express.Router();
 
+var config = require ('./config.js');
+
 var csrfProtection = csrf({ cookie: true })
 
 // Create controllers
